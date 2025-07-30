@@ -11,6 +11,8 @@ services:
     volumes:
       - ./:/code:Z
       - "${STORAGE_DIR}:/code/storage:Z"
+    env_file:
+      - .env
     networks:
       - dokploy-network
 
@@ -22,6 +24,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-generateconfig-processing
+    env_file:
+      - .env
     volumes:
       - ./:/code:Z
       - "${STORAGE_DIR}:/code/storage:Z"
@@ -39,6 +43,8 @@ services:
       test: test $$(mongosh --port ${MONGO_1_PORT} --quiet --eval "try {rs.initiate({_id:'${MONGO_REPLICA_SET}',members:[{_id:0,host:\"mongo-1:${MONGO_1_PORT}\"}]})} catch(e) {rs.status().ok}") -eq 1
       interval: 10s
       start_period: 30s
+    env_file:
+      - .env
     ports:
       - "${MONGO_1_PORT}:${MONGO_1_PORT}"
     networks:
@@ -75,6 +81,8 @@ services:
       interval: 10s
       timeout: 30s
       retries: 3
+    env_file:
+      - .env
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
     networks:
@@ -102,6 +110,8 @@ services:
       interval: 5s
       timeout: 10s
       retries: 3
+    env_file:
+      - .env
     ports:
       - "${EXTERNAL_MINIO_WEB_PORT}:${MINIO_WEB_PORT}"
     networks:
@@ -117,6 +127,8 @@ services:
       /usr/bin/mc mb minio/${MINIO_BUCKET};
       exit 0;
       "
+    env_file:
+      - .env
     networks:
       - dokploy-network
 
@@ -139,6 +151,8 @@ services:
         "/etc/any-sync-coordinator/network.yml",
         "-e",
       ]
+    env_file:
+      - .env
     networks:
       - dokploy-network
 
@@ -164,6 +178,8 @@ services:
       resources:
         limits:
           memory: ${ANY_SYNC_DAEMONS_MEMORY_LIMIT:-}
+    env_file:
+      - .env
     restart: unless-stopped
 
   any-sync-filenode:
@@ -189,6 +205,8 @@ services:
       resources:
         limits:
           memory: ${ANY_SYNC_DAEMONS_MEMORY_LIMIT:-}
+    env_file:
+      - .env
     restart: unless-stopped
 
   any-sync-node-1:
@@ -212,6 +230,8 @@ services:
       resources:
         limits:
           memory: ${ANY_SYNC_DAEMONS_MEMORY_LIMIT:-}
+    env_file:
+      - .env
     restart: unless-stopped
 
   any-sync-node-2:
@@ -235,6 +255,8 @@ services:
       resources:
         limits:
           memory: ${ANY_SYNC_DAEMONS_MEMORY_LIMIT:-}
+    env_file:
+      - .env
     restart: unless-stopped
 
   any-sync-node-3:
@@ -258,6 +280,8 @@ services:
       resources:
         limits:
           memory: ${ANY_SYNC_DAEMONS_MEMORY_LIMIT:-}
+    env_file:
+      - .env
     restart: unless-stopped
 
   any-sync-consensusnode:
@@ -278,6 +302,8 @@ services:
       resources:
         limits:
           memory: ${ANY_SYNC_DAEMONS_MEMORY_LIMIT:-}
+    env_file:
+      - .env
     restart: unless-stopped
 
   # any-sync-netcheck
@@ -295,6 +321,8 @@ services:
     volumes:
       - "${STORAGE_DIR}:/code/storage:Z"
     command: ["tail", "-f", "/dev/null"]
+    env_file:
+      - .env
     stop_signal: SIGKILL
     tty: true
     networks:
