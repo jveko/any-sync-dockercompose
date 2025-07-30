@@ -7,3 +7,4 @@
 /.env.override
 /account_stop.json
 /backup/
+.mcp.json

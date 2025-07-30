@@ -42,7 +42,7 @@ services:
     env_file:
       - .env
     ports:
-      - "${MONGO_1_PORT}:${MONGO_1_PORT}"
+      - "${MONGO_1_PORT}"
     networks:
       - anytype-network
 
@@ -80,7 +80,7 @@ services:
     env_file:
       - .env
     ports:
-      - "${REDIS_PORT}:${REDIS_PORT}"
+      - "${REDIS_PORT}"
     networks:
       - anytype-network
 
@@ -109,7 +109,7 @@ services:
     env_file:
       - .env
     ports:
-      - "${EXTERNAL_MINIO_WEB_PORT}:${MINIO_WEB_PORT}"
+      - "${MINIO_WEB_PORT}"
     networks:
       - anytype-network
 
@@ -162,9 +162,9 @@ services:
       any-sync-coordinator_bootstrap:
         condition: service_completed_successfully
     ports:
-      - "${ANY_SYNC_COORDINATOR_PORT}:${ANY_SYNC_COORDINATOR_PORT}"
-      - "${ANY_SYNC_COORDINATOR_QUIC_PORT}:${ANY_SYNC_COORDINATOR_QUIC_PORT}/udp"
-      - "${ANY_SYNC_COORDINATOR_METRIC_ADDR}:8000"
+      - "${ANY_SYNC_COORDINATOR_PORT}"
+      - "${ANY_SYNC_COORDINATOR_QUIC_PORT}/udp"
+      - "8000"
     networks:
       - anytype-network
     volumes:
@@ -188,9 +188,9 @@ services:
       any-sync-coordinator:
         condition: service_started
     ports:
-      - "${ANY_SYNC_FILENODE_PORT}:${ANY_SYNC_FILENODE_PORT}"
-      - "${ANY_SYNC_FILENODE_QUIC_PORT}:${ANY_SYNC_FILENODE_QUIC_PORT}/udp"
-      - "${ANY_SYNC_FILENODE_METRIC_ADDR}:8000"
+      - "${ANY_SYNC_FILENODE_PORT}"
+      - "${ANY_SYNC_FILENODE_QUIC_PORT}/udp"
+      - "8000"
     networks:
       - anytype-network
     volumes:
@@ -211,10 +211,10 @@ services:
       any-sync-coordinator:
         condition: service_started
     ports:
-      - "${ANY_SYNC_NODE_1_PORT}:${ANY_SYNC_NODE_1_PORT}"
-      - "${ANY_SYNC_NODE_1_QUIC_PORT}:${ANY_SYNC_NODE_1_QUIC_PORT}/udp"
-      - "${ANY_SYNC_NODE_1_API_SERVER_ADDR}:8080"
-      - "${ANY_SYNC_NODE_1_METRIC_ADDR}:8000"
+      - "${ANY_SYNC_NODE_1_PORT}"
+      - "${ANY_SYNC_NODE_1_QUIC_PORT}/udp"
+      - "8080"
+      - "8000"
     networks:
       - anytype-network
     volumes:
@@ -236,10 +236,10 @@ services:
       any-sync-coordinator:
         condition: service_started
     ports:
-      - "${ANY_SYNC_NODE_2_PORT}:${ANY_SYNC_NODE_2_PORT}"
-      - "${ANY_SYNC_NODE_2_QUIC_PORT}:${ANY_SYNC_NODE_2_QUIC_PORT}/udp"
-      - "${ANY_SYNC_NODE_2_API_SERVER_ADDR}:8080"
-      - "${ANY_SYNC_NODE_2_METRIC_ADDR}:8000"
+      - "${ANY_SYNC_NODE_2_PORT}"
+      - "${ANY_SYNC_NODE_2_QUIC_PORT}/udp"
+      - "8080"
+      - "8000"
     networks:
       - anytype-network
     volumes:
@@ -261,10 +261,10 @@ services:
       any-sync-coordinator:
         condition: service_started
     ports:
-      - "${ANY_SYNC_NODE_3_PORT}:${ANY_SYNC_NODE_3_PORT}"
-      - "${ANY_SYNC_NODE_3_QUIC_PORT}:${ANY_SYNC_NODE_3_QUIC_PORT}/udp"
-      - "${ANY_SYNC_NODE_3_API_SERVER_ADDR}:8080"
-      - "${ANY_SYNC_NODE_3_METRIC_ADDR}:8000"
+      - "${ANY_SYNC_NODE_3_PORT}"
+      - "${ANY_SYNC_NODE_3_QUIC_PORT}/udp"
+      - "8080"
+      - "8000"
     networks:
       - anytype-network
     volumes:
@@ -286,9 +286,9 @@ services:
       any-sync-coordinator:
         condition: service_started
     ports:
-      - "${ANY_SYNC_CONSENSUSNODE_PORT}:${ANY_SYNC_CONSENSUSNODE_PORT}"
-      - "${ANY_SYNC_CONSENSUSNODE_QUIC_PORT}:${ANY_SYNC_CONSENSUSNODE_QUIC_PORT}/udp"
-      - "${ANY_SYNC_CONSENSUSNODE_METRIC_ADDR}:8000"
+      - "${ANY_SYNC_CONSENSUSNODE_PORT}"
+      - "${ANY_SYNC_CONSENSUSNODE_QUIC_PORT}/udp"
+      - "8000"
     networks:
       - anytype-network
     volumes:
