@@ -9,7 +9,7 @@ services:
       context: .
       dockerfile: Dockerfile-generateconfig-anyconf
     volumes:
-      - ../files:/code:Z
+      - ../:/code:Z
       - "${STORAGE_DIR}:/code/storage:Z"
 
   # processing any-sync-* configs
@@ -21,7 +21,7 @@ services:
       context: .
       dockerfile: Dockerfile-generateconfig-processing
     volumes:
-      - ../files:/code:Z
+      - ./:/code:Z
       - "${STORAGE_DIR}:/code/storage:Z"
 
   mongo-1:
