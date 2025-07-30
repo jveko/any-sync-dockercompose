@@ -1,3 +1,7 @@
+networks:
+  dokploy-network:
+    external: true
+
 services:
   # generate configs using the anyconf utility
   generateconfig-anyconf:
@@ -5,7 +9,7 @@ services:
       context: .
       dockerfile: Dockerfile-generateconfig-anyconf
     volumes:
-      - ./:/code:Z
+      - ../files:/code:Z
       - "${STORAGE_DIR}:/code/storage:Z"
 
   # processing any-sync-* configs
@@ -17,7 +21,7 @@ services:
       context: .
       dockerfile: Dockerfile-generateconfig-processing
     volumes:
-      - ./:/code:Z
+      - ../files:/code:Z
       - "${STORAGE_DIR}:/code/storage:Z"
 
   mongo-1:
@@ -34,7 +38,9 @@ services:
       interval: 10s
       start_period: 30s
     ports:
-      - "127.0.0.1:${MONGO_1_PORT}:${MONGO_1_PORT}"
+      - "${MONGO_1_PORT}:${MONGO_1_PORT}"
+    networks:
+      - dokploy-network
 
   redis:
     depends_on:
@@ -42,21 +48,48 @@ services:
         condition: service_completed_successfully
     image: "redis/redis-stack-server:${REDIS_VERSION}"
     restart: unless-stopped
-    command: ["redis-server", "--port", "${REDIS_PORT}", "--dir", "/data/", "--appendonly", "yes", "--maxmemory", "${REDIS_MAXMEMORY}", "--maxmemory-policy", "noeviction", "--protected-mode", "no", "--loadmodule", "/opt/redis-stack/lib/redisbloom.so"]
+    command:
+      [
+        "redis-server",
+        "--port",
+        "${REDIS_PORT}",
+        "--dir",
+        "/data/",
+        "--appendonly",
+        "yes",
+        "--maxmemory",
+        "${REDIS_MAXMEMORY}",
+        "--maxmemory-policy",
+        "noeviction",
+        "--protected-mode",
+        "no",
+        "--loadmodule",
+        "/opt/redis-stack/lib/redisbloom.so",
+      ]
     volumes:
       - "${STORAGE_DIR}/redis:/data:Z"
     healthcheck:
-      test: [ "CMD", "redis-cli", "--raw", "-p", "${REDIS_PORT}", "incr", "ping" ]
+      test: ["CMD", "redis-cli", "--raw", "-p", "${REDIS_PORT}", "incr", "ping"]
       interval: 10s
       timeout: 30s
       retries: 3
     ports:
-      - "127.0.0.1:${REDIS_PORT}:${REDIS_PORT}"
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    networks:
+      - dokploy-network
 
   minio:
     image: "minio/minio:${MINIO_VERSION}"
     restart: unless-stopped
-    command: ["server", "/data", "--console-address", ":${MINIO_WEB_PORT}", "--address", ":${MINIO_PORT}"]
+    command:
+      [
+        "server",
+        "/data",
+        "--console-address",
+        ":${MINIO_WEB_PORT}",
+        "--address",
+        ":${MINIO_PORT}",
+      ]
     environment:
       MINIO_ROOT_USER: "${AWS_ACCESS_KEY_ID}"
       MINIO_ROOT_PASSWORD: "${AWS_SECRET_ACCESS_KEY}"
@@ -67,12 +100,10 @@ services:
       interval: 5s
       timeout: 10s
       retries: 3
-    networks:
-      default:
-        aliases:
-          - "${MINIO_BUCKET}.minio" # <bucket-name>.<endpoint-name>
     ports:
-      - "127.0.0.1:${EXTERNAL_MINIO_WEB_PORT}:${MINIO_WEB_PORT}"
+      - "${EXTERNAL_MINIO_WEB_PORT}:${MINIO_WEB_PORT}"
+    networks:
+      - dokploy-network
 
   create-bucket:
     image: minio/mc:latest
@@ -93,9 +124,17 @@ services:
       mongo-1:
         condition: service_healthy
     volumes:
-      - ./etc/any-sync-coordinator:/etc/any-sync-coordinator:Z
+      - ../files/any-sync-coordinator:/etc/any-sync-coordinator:Z
     restart: "no"
-    command: ["/bin/any-sync-confapply", "-c", "/etc/any-sync-coordinator/config.yml", "-n", "/etc/any-sync-coordinator/network.yml", "-e"]
+    command:
+      [
+        "/bin/any-sync-confapply",
+        "-c",
+        "/etc/any-sync-coordinator/config.yml",
+        "-n",
+        "/etc/any-sync-coordinator/network.yml",
+        "-e",
+      ]
 
   any-sync-coordinator:
     image: "ghcr.io/anyproto/any-sync-coordinator:${ANY_SYNC_COORDINATOR_VERSION}"
@@ -110,8 +149,10 @@ services:
       - "${ANY_SYNC_COORDINATOR_PORT}:${ANY_SYNC_COORDINATOR_PORT}"
       - "${ANY_SYNC_COORDINATOR_QUIC_PORT}:${ANY_SYNC_COORDINATOR_QUIC_PORT}/udp"
       - "${ANY_SYNC_COORDINATOR_METRIC_ADDR}:8000"
+    networks:
+      - dokploy-network
     volumes:
-      - ./etc/any-sync-coordinator:/etc/any-sync-coordinator:Z
+      - ../files/any-sync-coordinator:/etc/any-sync-coordinator:Z
       - "${STORAGE_DIR}/networkStore/any-sync-coordinator:/networkStore:Z"
     deploy:
       resources:
@@ -132,9 +173,11 @@ services:
       - "${ANY_SYNC_FILENODE_PORT}:${ANY_SYNC_FILENODE_PORT}"
       - "${ANY_SYNC_FILENODE_QUIC_PORT}:${ANY_SYNC_FILENODE_QUIC_PORT}/udp"
       - "${ANY_SYNC_FILENODE_METRIC_ADDR}:8000"
+    networks:
+      - dokploy-network
     volumes:
-      - ./etc/any-sync-filenode:/etc/any-sync-filenode:Z
-      - ./etc/.aws:/root/.aws:ro
+      - ../files/any-sync-filenode:/etc/any-sync-filenode:Z
+      - ../files/.aws:/root/.aws:ro
       - "${STORAGE_DIR}/networkStore/any-sync-filenode:/networkStore:Z"
     deploy:
       resources:
@@ -152,8 +195,10 @@ services:
       - "${ANY_SYNC_NODE_1_QUIC_PORT}:${ANY_SYNC_NODE_1_QUIC_PORT}/udp"
       - "${ANY_SYNC_NODE_1_API_SERVER_ADDR}:8080"
       - "${ANY_SYNC_NODE_1_METRIC_ADDR}:8000"
+    networks:
+      - dokploy-network
     volumes:
-      - ./etc/any-sync-node-1:/etc/any-sync-node:Z
+      - ../files/any-sync-node-1:/etc/any-sync-node:Z
       - "${STORAGE_DIR}/any-sync-node-1:/storage:Z"
       - "${STORAGE_DIR}/anyStorage/any-sync-node-1:/anyStorage:Z"
       - "${STORAGE_DIR}/networkStore/any-sync-node-1:/networkStore:Z"
@@ -173,8 +218,10 @@ services:
       - "${ANY_SYNC_NODE_2_QUIC_PORT}:${ANY_SYNC_NODE_2_QUIC_PORT}/udp"
       - "${ANY_SYNC_NODE_2_API_SERVER_ADDR}:8080"
       - "${ANY_SYNC_NODE_2_METRIC_ADDR}:8000"
+    networks:
+      - dokploy-network
     volumes:
-      - ./etc/any-sync-node-2:/etc/any-sync-node:Z
+      - ../files/any-sync-node-2:/etc/any-sync-node:Z
       - "${STORAGE_DIR}/any-sync-node-2:/storage:Z"
       - "${STORAGE_DIR}/anyStorage/any-sync-node-2:/anyStorage:Z"
       - "${STORAGE_DIR}/networkStore/any-sync-node-2:/networkStore:Z"
@@ -194,8 +241,10 @@ services:
       - "${ANY_SYNC_NODE_3_QUIC_PORT}:${ANY_SYNC_NODE_3_QUIC_PORT}/udp"
       - "${ANY_SYNC_NODE_3_API_SERVER_ADDR}:8080"
       - "${ANY_SYNC_NODE_3_METRIC_ADDR}:8000"
+    networks:
+      - dokploy-network
     volumes:
-      - ./etc/any-sync-node-3:/etc/any-sync-node:Z
+      - ../files/any-sync-node-3:/etc/any-sync-node:Z
       - "${STORAGE_DIR}/any-sync-node-3:/storage:Z"
       - "${STORAGE_DIR}/anyStorage/any-sync-node-3:/anyStorage:Z"
       - "${STORAGE_DIR}/networkStore/any-sync-node-3:/networkStore:Z"
@@ -214,8 +263,10 @@ services:
       - "${ANY_SYNC_CONSENSUSNODE_PORT}:${ANY_SYNC_CONSENSUSNODE_PORT}"
       - "${ANY_SYNC_CONSENSUSNODE_QUIC_PORT}:${ANY_SYNC_CONSENSUSNODE_QUIC_PORT}/udp"
       - "${ANY_SYNC_CONSENSUSNODE_METRIC_ADDR}:8000"
+    networks:
+      - dokploy-network
     volumes:
-      - ./etc/any-sync-consensusnode:/etc/any-sync-consensusnode:Z
+      - ../files/any-sync-consensusnode:/etc/any-sync-consensusnode:Z
       - "${STORAGE_DIR}/networkStore/any-sync-consensusnode:/networkStore:Z"
     deploy:
       resources:
@@ -240,6 +291,8 @@ services:
     command: ["tail", "-f", "/dev/null"]
     stop_signal: SIGKILL
     tty: true
+    networks:
+      - dokploy-network
     healthcheck:
       test: any-sync-netcheck -c /code/storage/docker-generateconfig/nodes.yml 2>&1| grep -E 'netcheck\s+success'
       interval: 10s
