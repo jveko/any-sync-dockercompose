@@ -334,8 +334,8 @@ services:
     restart: unless-stopped
     environment:
       - PANGOLIN_ENDPOINT=${PANGOLIN_ENDPOINT}
-      - NEWT_ID=xrannowuswekw3n
-      - NEWT_SECRET=kjm2n8kmn2i85a82h6ye0sghz0q263ewz2d2c93704ja9spa
+      - NEWT_ID=${NEWT_ID}
+      - NEWT_SECRET=${NEWT_SECRET}
     networks:
       - anytype-network
 
