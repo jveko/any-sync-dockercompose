@@ -11,6 +11,8 @@ services:
     volumes:
       - ./:/code:Z
       - "${STORAGE_DIR}:/code/storage:Z"
+    networks:
+      - dokploy-network
 
   # processing any-sync-* configs
   generateconfig-processing:
@@ -115,6 +117,8 @@ services:
       /usr/bin/mc mb minio/${MINIO_BUCKET};
       exit 0;
       "
+    networks:
+      - dokploy-network
 
   any-sync-coordinator_bootstrap:
     image: "ghcr.io/anyproto/any-sync-coordinator:${ANY_SYNC_COORDINATOR_VERSION}"
@@ -135,6 +139,8 @@ services:
         "/etc/any-sync-coordinator/network.yml",
         "-e",
       ]
+    networks:
+      - dokploy-network
 
   any-sync-coordinator:
     image: "ghcr.io/anyproto/any-sync-coordinator:${ANY_SYNC_COORDINATOR_VERSION}"
