@@ -124,7 +124,7 @@ services:
       mongo-1:
         condition: service_healthy
     volumes:
-      - ../files/any-sync-coordinator:/etc/any-sync-coordinator:Z
+      - ./etc/any-sync-coordinator:/etc/any-sync-coordinator:Z
     restart: "no"
     command:
       [
@@ -152,7 +152,7 @@ services:
     networks:
       - dokploy-network
     volumes:
-      - ../files/any-sync-coordinator:/etc/any-sync-coordinator:Z
+      - ./etc/any-sync-coordinator:/etc/any-sync-coordinator:Z
       - "${STORAGE_DIR}/networkStore/any-sync-coordinator:/networkStore:Z"
     deploy:
       resources:
@@ -176,8 +176,8 @@ services:
     networks:
       - dokploy-network
     volumes:
-      - ../files/any-sync-filenode:/etc/any-sync-filenode:Z
-      - ../files/.aws:/root/.aws:ro
+      - ./etc/any-sync-filenode:/etc/any-sync-filenode:Z
+      - ./etc/.aws:/root/.aws:ro
       - "${STORAGE_DIR}/networkStore/any-sync-filenode:/networkStore:Z"
     deploy:
       resources:
@@ -198,7 +198,7 @@ services:
     networks:
       - dokploy-network
     volumes:
-      - ../files/any-sync-node-1:/etc/any-sync-node:Z
+      - ./etc/any-sync-node-1:/etc/any-sync-node:Z
       - "${STORAGE_DIR}/any-sync-node-1:/storage:Z"
       - "${STORAGE_DIR}/anyStorage/any-sync-node-1:/anyStorage:Z"
       - "${STORAGE_DIR}/networkStore/any-sync-node-1:/networkStore:Z"
@@ -221,7 +221,7 @@ services:
     networks:
       - dokploy-network
     volumes:
-      - ../files/any-sync-node-2:/etc/any-sync-node:Z
+      - ./etc/any-sync-node-2:/etc/any-sync-node:Z
       - "${STORAGE_DIR}/any-sync-node-2:/storage:Z"
       - "${STORAGE_DIR}/anyStorage/any-sync-node-2:/anyStorage:Z"
       - "${STORAGE_DIR}/networkStore/any-sync-node-2:/networkStore:Z"
@@ -244,7 +244,7 @@ services:
     networks:
       - dokploy-network
     volumes:
-      - ../files/any-sync-node-3:/etc/any-sync-node:Z
+      - ./etc/any-sync-node-3:/etc/any-sync-node:Z
       - "${STORAGE_DIR}/any-sync-node-3:/storage:Z"
       - "${STORAGE_DIR}/anyStorage/any-sync-node-3:/anyStorage:Z"
       - "${STORAGE_DIR}/networkStore/any-sync-node-3:/networkStore:Z"
@@ -266,7 +266,7 @@ services:
     networks:
       - dokploy-network
     volumes:
-      - ../files/any-sync-consensusnode:/etc/any-sync-consensusnode:Z
+      - ./etc/any-sync-consensusnode:/etc/any-sync-consensusnode:Z
       - "${STORAGE_DIR}/networkStore/any-sync-consensusnode:/networkStore:Z"
     deploy:
       resources:
