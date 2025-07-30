@@ -331,6 +331,15 @@ services:
   newt:
     image: fosrl/newt
     restart: unless-stopped
+    depends_on:
+      - any-sync-consensusnode
+      - any-sync-filenode
+      - any-sync-coordinator
+      - any-sync-node-1
+      - any-sync-node-2
+      - any-sync-node-3
+    env_file:
+      - .env
     environment:
       - PANGOLIN_ENDPOINT=${PANGOLIN_ENDPOINT}
       - NEWT_ID=${NEWT_ID}
