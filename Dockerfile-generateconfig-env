@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1
 FROM python:3.11-alpine
+RUN mkdir -p /code
 COPY /code /
 WORKDIR /code
 COPY docker-generateconfig/env-requirements.txt requirements.txt
